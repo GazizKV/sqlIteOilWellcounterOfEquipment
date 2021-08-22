@@ -7,32 +7,38 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class DatabaseTenementSystem {
+public class DBMS {
 
     Connection connection = null;
     BufferedReader reader = null;
 
-    static {
-        BufferedReader reader = null;
-        Connection connection = null;
-
+    DBMS() {
         try {
             reader = new BufferedReader(new InputStreamReader(System.in));
             Class.forName("org.sqlite.JDBC");
             connection = DriverManager.getConnection(
                     "jdbc:sqlite:well.db"
             );
-            if (connection.getCatalog() != null)
-                System.out.println(connection.getCatalog().toString());
-            System.out.println("Connect!");
+            System.out.println("Connect to DB :" + connection.getMetaData().getDatabaseProductName());
+
+            if(connection == null) {
+                System.out.println("Базаданных не содержит какой либо информации.");
+            }
         } catch (SQLException | ClassNotFoundException e) {
             System.out.println(e.getMessage());
         }
     }
 
-
-
     void open() {
+        try {
+            Class.forName("org.sql.JDBC");
+            Connection connection = DriverManager.getConnection(
+                    "jdbc:sqlite:well.db"
+            );
+            System.out.println("Connect to DB" + connection.getMetaData().getDatabaseProductName());
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -40,7 +46,7 @@ public class DatabaseTenementSystem {
         try {
             System.out.println("Enter well name : ");
             String name = reader.readLine();
-            System.out.println("Enter well number : ");
+            System.out.println("Enter number of equipment : ");
             String number = reader.readLine();
 
             String query =
@@ -64,13 +70,12 @@ public class DatabaseTenementSystem {
 
     }
 
-    void close() {
+    void close() throws SQLException {
         try {
             connection.close();
             reader.close();
-            System.exit(0);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+        } catch (SQLException | IOException e) {
+            e.printStackTrace();
         }
     }
 

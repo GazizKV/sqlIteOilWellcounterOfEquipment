@@ -11,7 +11,7 @@ public class ProgramForCountingEquipment {
         String inCommand = null;
 
 
-        DatabaseTenementSystem DBMS = new DatabaseTenementSystem();
+        DBMS DBMS = new DBMS();
         reader = new BufferedReader(new InputStreamReader(System.in));
 
 
@@ -39,6 +39,8 @@ public class ProgramForCountingEquipment {
                     case "4":
                         nextCommand = false;
                         DBMS.close();
+                        System.out.println("DBMS closed");
+                        reader.close();
                         break;
                     default:
                         System.out.println("Вы ввели неверную комманду.");
