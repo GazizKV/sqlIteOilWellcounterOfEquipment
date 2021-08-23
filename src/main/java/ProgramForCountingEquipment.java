@@ -11,7 +11,7 @@ public class ProgramForCountingEquipment {
         String inCommand = null;
 
 
-        DBMS DBMS = new DBMS();
+        DataBaseManagementSystem DBMS = DataBaseManagementSystem.getDBMS();
         reader = new BufferedReader(new InputStreamReader(System.in));
 
 
@@ -19,11 +19,11 @@ public class ProgramForCountingEquipment {
         while (nextCommand) {
             try {
                 System.out.println("МЕНЮ");
-                System.out.println("1. Добавить обарудование на скважину.");
-                System.out.println("2. Вывести общую информацию об обарудовании на скважинах.");
+                System.out.println("1. Добавить оборудование на скважину.");
+                System.out.println("2. Вывести общую информацию об оборудовании на скважинах.");
                 System.out.println("3. Экспорт всех данных в XML.");
                 System.out.println("4. Закрыть программу.");
-                System.out.print("Наберите нужный номер комманды и нажмите Enter.");
+                System.out.print("Наберите нужный номер команды и нажмите Enter.\n");
                 inCommand = reader.readLine();
 
                 switch (inCommand) {
