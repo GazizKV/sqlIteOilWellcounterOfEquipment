@@ -4,9 +4,7 @@ import java.io.InputStreamReader;
 import java.security.SecureRandom;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 
 public class DataBaseManagementSystem {
 
@@ -77,7 +75,7 @@ public class DataBaseManagementSystem {
                 statement.executeUpdate(insertIntoWellsNewWellWithEquipment);
 
                 // Создание таблицы оборудование если она не существует.
-                String createTableEquipmentIfNotExist = "create table if not exists '" + name + "'(" +
+                String createTableEquipmentIfNotExist = "create table if not exists " + name + "(" +
                         "id integer primary key autoincrement not null," +
                         "name varchar(10) not null," +
                         "unique(id, name)" +
@@ -86,14 +84,7 @@ public class DataBaseManagementSystem {
 
 
                 // Добавление строк в таблицу оборудование.
-                ArrayList<String> uniqueNames = getArrayaListOfNamesWithUniqueName(numberEquipment);
-                for (String uniqueName  : uniqueNames) {
-                    String insertIntoEquipment = "" +
-                            "INSERT INTO equipment(name) " +
-                            "values('" + uniqueName +  "'" +
-                            ");";
-                    statement.executeUpdate(insertIntoEquipment);
-                }
+                insertIntoEquipmentTable(numberEquipment, name);
 
                 System.out.println("Rows added.");
 
@@ -103,12 +94,28 @@ public class DataBaseManagementSystem {
         }
     }
 
-    private ArrayList<String> getArrayaListOfNamesWithUniqueName(int number) {
+    private void insertIntoEquipmentTable(int numberEquipment, String name) {
+        ArrayList<String> uniqueNames = getArrayListOfNamesWithUniqueName(numberEquipment);
+        for (String uniqueName  : uniqueNames) {
+            String insertIntoEquipment = "" +
+                    "INSERT INTO " + name + "(name) " +
+                    "values('" + uniqueName +  "'" +
+                    ");";
+            try {
+                statement.executeUpdate(insertIntoEquipment);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+    private ArrayList<String> getArrayListOfNamesWithUniqueName(int number) {
         ArrayList<String> result = new ArrayList<>();
         SecureRandom rnd = new SecureRandom();
         StringBuilder stringBuilder = new StringBuilder();
         while (number > 0) {
-            stringBuilder = null;
+            stringBuilder.delete(0, stringBuilder.length());
             for (int i = 0; i < 10; i++) {
                 stringBuilder.append(AB.charAt(rnd.nextInt(AB.length())));
             }
@@ -120,6 +127,7 @@ public class DataBaseManagementSystem {
 
     private void addToExistingWell(String name, int numberForAdd) {
         try {
+            // Добавление в существующую скважину
             String queryGetNumberOfWell = "select numberEquipment from wells where name='" + name + "'";
             ResultSet rs = statement.executeQuery(queryGetNumberOfWell);
             int equipmentNumber = rs.getInt("numberEquipment") + numberForAdd;
@@ -127,6 +135,8 @@ public class DataBaseManagementSystem {
                     "update wells " +
                     "set number = " + equipmentNumber + " " +
                     "where name = '" + name + "'";
+            // Добавление в существующую таблицу оборудования по имени скважины
+            insertIntoEquipmentTable(numberForAdd, name);
         } catch (SQLException e) {
             e.printStackTrace();
         }
