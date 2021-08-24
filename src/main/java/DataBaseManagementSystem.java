@@ -4,7 +4,9 @@ import java.io.InputStreamReader;
 import java.security.SecureRandom;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 public class DataBaseManagementSystem {
 
@@ -56,6 +58,10 @@ public class DataBaseManagementSystem {
             String name = reader.readLine().toLowerCase(Locale.ROOT);
             System.out.println("Введите количество оборудования : ");
             int numberEquipment = Integer.parseInt(reader.readLine());
+            if(numberEquipment<1) {
+                System.out.println("Вы ввели 0 или отрицательное количество оборудования.");
+                insert();
+            }
             if(isExist(name)) {
                 System.out.println("Такая скважина числиться в БД.");
                 System.out.println("Введите 1 что бы добавить количество оборудования к существующей скважине.");
@@ -177,21 +183,24 @@ public class DataBaseManagementSystem {
             System.out.println("Введите названия скважин через пробел :");
             String[] wellNames = reader.readLine().split(" ");
             if(wellNames.length == 0) {
-                System.out.println("Вы не ввели 0 названий. Попробуйте снова.");
+                System.out.println("Вы не ввели 0 названий или отрицательное количество. Попробуйте снова.");
             }
-            String query = "select name, number" +
-                    " from wells" +
-                    "order by number";
-            ResultSet rs = statement.executeQuery(query);
-            System.out.println("id  name    number");
-            while(rs.next()) {
-                int id = rs.getInt("id");
-                String name = rs.getString("name");
-                String number = rs.getString("number");
-                System.out.println(id + "\t" +
-                        name + "\t" +
-                        number);
+            Map<String, String> namesAndNumberList = new HashMap<>();
+            ResultSet rs = null;
+            String query = "";
+            for (int i = 0; i < wellNames.length; i++) {
+                query = "select name, numberEquipment from wells where name='" + wellNames[i] +  "'";
+                rs = statement.executeQuery(query);
+                rs.next();
+                namesAndNumberList.put(rs.getString("name"), rs.getString("numberEquipment"));
             }
+
+            System.out.println("name \t number");
+            for (Map.Entry<String, String> entry :
+                    namesAndNumberList.entrySet()) {
+                System.out.println(entry.getKey() + "\t" + entry.getValue());
+            }
+            
             rs.close();
         } catch (SQLException e) {
             e.printStackTrace();
