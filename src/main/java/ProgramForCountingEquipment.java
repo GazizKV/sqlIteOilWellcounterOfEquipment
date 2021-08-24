@@ -43,7 +43,7 @@ public class ProgramForCountingEquipment {
                         reader.close();
                         break;
                     default:
-                        System.out.println("Вы ввели неверную комманду.");
+                        System.out.println("Вы ввели неверную команду.");
                         break;
                 }
             } catch (IOException e) {

@@ -130,11 +130,14 @@ public class DataBaseManagementSystem {
             // Добавление в существующую скважину
             String queryGetNumberOfWell = "select numberEquipment from wells where name='" + name + "'";
             ResultSet rs = statement.executeQuery(queryGetNumberOfWell);
+            rs.next();
             int equipmentNumber = rs.getInt("numberEquipment") + numberForAdd;
+            System.out.println(equipmentNumber);
             String stringUpdatedNumberOfName = "" +
                     "update wells " +
-                    "set number = " + equipmentNumber + " " +
+                    "set numberEquipment = " + equipmentNumber + " " +
                     "where name = '" + name + "'";
+            statement.executeUpdate(stringUpdatedNumberOfName);
             // Добавление в существующую таблицу оборудования по имени скважины
             insertIntoEquipmentTable(numberForAdd, name);
         } catch (SQLException e) {
@@ -171,8 +174,12 @@ public class DataBaseManagementSystem {
 
     void showVewOfAllInfo() throws IOException, SQLException {
         try {
-            Statement statement = connection.createStatement();
-            String query = "select id, name, number" +
+            System.out.println("Введите названия скважин через пробел :");
+            String[] wellNames = reader.readLine().split(" ");
+            if(wellNames.length == 0) {
+                System.out.println("Вы не ввели 0 названий. Попробуйте снова.");
+            }
+            String query = "select name, number" +
                     " from wells" +
                     "order by number";
             ResultSet rs = statement.executeQuery(query);
