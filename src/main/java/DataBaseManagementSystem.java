@@ -34,7 +34,7 @@ public class DataBaseManagementSystem {
     private void createTableIfNotExist() {
         String creatingTableWells = "create table if not exists wells(" +
                 "id integer primary key autoincrement not null," +
-                "name varchar(10) not null," +
+                "name varchar(32) not null," +
                 "numberEquipment integer not null," +
                 "unique(id, name)" +
                 ");";
@@ -101,7 +101,7 @@ public class DataBaseManagementSystem {
     }
 
     private void insertIntoEquipmentTable(int numberEquipment, String name) {
-        ArrayList<String> uniqueNames = getArrayListOfNamesWithUniqueName(numberEquipment);
+        ArrayList<String> uniqueNames = getArrayListUniqueNames(numberEquipment);
         for (String uniqueName  : uniqueNames) {
             String insertIntoEquipment = "" +
                     "INSERT INTO " + name + "(name) " +
@@ -116,16 +116,27 @@ public class DataBaseManagementSystem {
 
     }
 
-    private ArrayList<String> getArrayListOfNamesWithUniqueName(int number) {
+    private ArrayList<String> getArrayListUniqueNames(int number) {
         ArrayList<String> result = new ArrayList<>();
         SecureRandom rnd = new SecureRandom();
         StringBuilder stringBuilder = new StringBuilder();
         while (number > 0) {
             stringBuilder.delete(0, stringBuilder.length());
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < 32; i++) {
                 stringBuilder.append(AB.charAt(rnd.nextInt(AB.length())));
             }
-            result.add(stringBuilder.toString());
+
+            try {
+                String queryIsExist = "select name from wells where name='" + stringBuilder.toString() + "'";
+                ResultSet rs = statement.executeQuery(queryIsExist);
+                if(rs.next()) {
+                    continue;
+                } else {
+                    result.add(stringBuilder.toString());
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
             number--;
         }
         return result;
